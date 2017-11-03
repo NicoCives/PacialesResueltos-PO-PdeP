@@ -1,4 +1,8 @@
-#Niño
+#Niño inherits LegionNiños
+
+method cantidadCaramelos()= cantidadCaramelos
+
+method cantidadCaramelos(_cantidadCaramelos){cantidadCaramelos= _cantidadCaramelos }
 
 const elementos = []
 
@@ -6,15 +10,18 @@ method cantidadCaramelos()= cantidadCaramelos
 
 method actitud() = actitud
 
-method CapacidadAsustar(elementos) = elementos.sustoQueGenera() * self.actitud()
+method capacidadAsustar(elementos) = elementos.sustoQueGenera() * self.actitud()
 
 method sustoQueGeneranTodos()= elementos.sum(elementos => elementos.sustoQueGenera())
 
-method intentaAsustarA(adulto)= {
-	if(adulto.toleranciaA()
+override method intentaAsustarA(adulto)= {
+	if(adulto.toleranciaA() < self.capacidadAsustar())
+		cantidadCaramelos += adulto.entregaCaramelosA()
 }
 
 method niñoConMasDe15Caramelos()= self.cantidadCaramelos > 15
+
+method niñoConMasDe10Caramelos()= self.cantidadCaramelos > 10
 
 #Elementos
 
@@ -47,13 +54,63 @@ method cantidadNiñosConMasDe15Caramelos()= niñosQueLoAsustaron.count(niños => ni
 
 method niñosConMasDe15Caramelos()= niñosQueLeAsustaron.filter(niños => niños.niñoConMasDe15Caramelos())
 
-method entregaCaramelosA(niño)
+method entregaCaramelosA()= self.toleranciaA() / 2
 
 #AdultoComun
 
-override method entregaCaramelosA(niño)= self.toleranciaA(niño) / 2
+override method entregaCaramelosA()= super()
 
 #AdultoAbuelo
 
-overr
-)
+override method entregaCaramelosA()= super() / 2
+
+#AdultoNecio
+
+override method entregaCaramelosA()= 0
+
+
+#LegionNiños
+
+const niños= []
+
+const niñosConjunto= #{}
+
+method conjuntoSinRepetir()= niñosConjunto.asSet()
+
+method cantidadDeNiños()= conjuntoSinRepetir().size()
+
+method conversionConjunto()= niños.conjuntoSinRepetir().sortedBy(condicion)
+
+method crearLegion(){
+	if(self.cantidadDeNiños > 2)
+		niños= self.conversionConjunto()
+	else
+		throw new UserException ("El conjunto no posee al menos 2 niños")
+}
+
+method elLiderEs()= niños.max(niño => niño.capacidadAsustar())
+
+method cantidadCaramelosLegion(_cantidadCaramelosLegion){cantidadCaramelosLegion = _cantidadCaramelosLegion}
+
+method cantidadCaramelosLegion()= niños.sum(niño => niño.cantidadCaramelos)
+
+method capacidadAsustarLegion()= niños.sum(niño =>niño.capacidadAsustar())
+
+method intentarAsustarA(adulto)= {
+	if(adulto.toleranciaA() < self.capacidadAsustarLegion())
+		self.elLiderEs().cantidadCaramelos += adulto.entregaCaramelosA()
+} 
+
+#UserException inherits Exception
+
+
+#Barrio
+
+const niños =[]
+
+method niñosOrdenadosXCantidadCaramelos()= niños.sortedBy(n1, n2 => n1.cantidadCaramelos() > n2.cantidadCaramelos())
+
+const niñosOrdenados= self.niñosOrdenadosXCantidadCaramelos()
+
+method LosPrimeros3niñosConMasCaramelos()= niñosOrdenados.taken(3)
+
